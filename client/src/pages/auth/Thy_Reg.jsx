@@ -1,22 +1,22 @@
-import React, {useState} from "react";
-import {Checkbox, Form, Input, Tooltip} from "antd";
-import {Button} from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {FaAccessibleIcon, FaFacebookF, FaGoogle} from "react-icons/fa";
-import {MdOutlineEmail} from "react-icons/md";
-import {FaPhoneFlip, FaUser} from "react-icons/fa6";
+import React, { useState } from "react";
+import { Checkbox, Form, Input, Tooltip } from "antd";
+import { Button } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { FaAccessibleIcon, FaFacebookF, FaGoogle } from "react-icons/fa";
+import { MdOutlineEmail } from "react-icons/md";
+import { FaPhoneFlip, FaUser } from "react-icons/fa6";
 import axios from "axios";
-import {openNotification} from "../../component/notification";
-import {motion} from "framer-motion";
-import {useTranslation} from "react-i18next";
+import { openNotification } from "../../component/notification";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import ChangeLangButton from "../../component/ChangeLangButton";
-import {SSO} from "@htilssu/wowo";
+import { SSO } from "@htilssu/wowo";
 
 const validateEmail = (email) => {
   return String(email)
     .toLowerCase()
     .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
 
@@ -57,43 +57,43 @@ const Register = () => {
     const { email, password, name, phone, agreeTerms } = formData;
 
     if (!email || !password || !name || !phone) {
-      openNotification(false, "Please fill all the fields");
+      openNotification("error", "Please fill all the fields");
       return;
     }
 
     if (!validateEmail(email)) {
-      openNotification(false, "Invalid email format");
+      openNotification("error", "Invalid email format");
       return;
     }
 
     if (password.length <= 8) {
-      openNotification(false, "Password should be at least 8 characters");
+      openNotification("error", "Password should be at least 8 characters");
       return;
     }
 
     if (phone.length !== 10 || !phone.startsWith("0")) {
-      openNotification(false, "Phone must be 10 digits and start with 0");
+      openNotification("error", "Phone must be 10 digits and start with 0");
       return;
     }
     if (!agreeTerms) {
-      openNotification(false, "You must agree to the terms of service");
+      openNotification("error", "You must agree to the terms of service");
       return;
     }
     try {
       const response = await axios.post(
         `${BE_PORT}/api/auth/signUpCus`,
-        formData,
+        formData
       );
       if (response.status === 200) {
-        openNotification(true, "Success register");
+        openNotification("success", "Success register");
         navigate("/login");
       }
     } catch (e) {
       console.log(e + "Error passing form data");
       openNotification(
-        false,
+       "error",
         "Failed to register",
-        "Please try again after 5 minutes",
+        "Please try again after 5 minutes"
       );
     }
   };

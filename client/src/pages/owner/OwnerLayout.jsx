@@ -1,10 +1,10 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from "react";
 import SideBar from "./SideBar";
 import Navbar from "./Navbar";
-import {Outlet, useNavigate} from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-import {useMediaQuery} from "react-responsive";
-import {AuthContext} from "../../hooks/auth.context";
+import { useMediaQuery } from "react-responsive";
+import { AuthContext } from "../../hooks/auth.context";
 
 function OwnerLayout() {
   const { auth } = useContext(AuthContext);
@@ -14,7 +14,7 @@ function OwnerLayout() {
   // useEffect(() => {
   //     if (auth.isAuthenticated) {
   //         if (auth.user.role !== "owner") {
-  //             openNotification(false, "Bạn không có quyền truy cập", "")
+  //             openNotification("error", "Bạn không có quyền truy cập", "")
   //             navigate("/")
   //         }
   //     }
@@ -28,7 +28,9 @@ function OwnerLayout() {
   return (
     <div className="flex">
       <div
-        className={`h-auto ${isMenu ? "h-0 md:h-auto hidden" : "basis-[20%] h-full"}`}
+        className={`h-auto ${
+          isMenu ? "h-0 md:h-auto hidden" : "basis-[20%] h-full"
+        }`}
       >
         <SideBar setIsMenuOpen={() => setIsMenu(true)} />
       </div>

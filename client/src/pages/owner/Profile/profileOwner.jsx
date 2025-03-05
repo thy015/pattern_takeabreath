@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Avatar,
   Button,
@@ -12,12 +12,12 @@ import {
   Modal,
   Typography,
 } from "antd";
-import {AuthContext} from "../../../hooks/auth.context";
+import { AuthContext } from "../../../hooks/auth.context";
 import axios from "axios";
 import dayjs from "dayjs";
-import {openNotification} from "../../../component/notification";
-import {useDispatch} from "react-redux";
-import {setOwner} from "../../../hooks/redux/ownerSlice";
+import { openNotification } from "../../../component/notification";
+import { useDispatch } from "react-redux";
+import { setOwner } from "../../../hooks/redux/ownerSlice";
 
 const { Title, Text } = Typography;
 
@@ -26,7 +26,7 @@ const UserInfoCard = () => {
   const BE_PORT = import.meta.env.VITE_BE_PORT;
   const [visible, setVisible] = useState(false);
   const [image, setImage] = useState(
-    "https://t4.ftcdn.net/jpg/05/11/55/91/360_F_511559113_UTxNAE1EP40z1qZ8hIzGNrB0LwqwjruK.jpg",
+    "https://t4.ftcdn.net/jpg/05/11/55/91/360_F_511559113_UTxNAE1EP40z1qZ8hIzGNrB0LwqwjruK.jpg"
   );
   const [editingField, setEditingField] = useState(null);
   const [form] = Form.useForm();
@@ -83,19 +83,19 @@ const UserInfoCard = () => {
     const stringPhone = phoneNum.toString();
     const idenCardString = idenCard.toString();
     if (!isValidEmail(email)) {
-      openNotification(false, "Email đúng dạng ", "");
+      openNotification("error", "Email đúng dạng ", "");
       return;
     }
     if (!isAgeAbove16(birthday)) {
-      openNotification(false, "Ngày sinh phải trên 16 tuổi", "");
+      openNotification("error", "Ngày sinh phải trên 16 tuổi", "");
       return;
     }
     if (stringPhone.length != 10) {
-      openNotification(false, "Số điện thoại phải đủ 10 chữ số", "");
+      openNotification("error", "Số điện thoại phải đủ 10 chữ số", "");
       return;
     }
     if (idenCardString.length != 12) {
-      openNotification(false, "Số chứng minh phải đủ 12 chữ số", "");
+      openNotification("error", "Số chứng minh phải đủ 12 chữ số", "");
       return;
     }
 
@@ -111,11 +111,11 @@ const UserInfoCard = () => {
         setVisible(false);
         setUser(newData);
         dispatch(setOwner(newData));
-        openNotification(true, "Cập nhật thành công", "");
+        openNotification("success", "Cập nhật thành công", "");
       })
       .catch((err) => {
         console.log(err);
-        openNotification(false, "Cập nhật thất bại", "");
+        openNotification("error", "Cập nhật thất bại", "");
       });
   };
 
@@ -135,7 +135,7 @@ const UserInfoCard = () => {
         {
           method: "POST",
           body: formData,
-        },
+        }
       );
       const uploadedImageURL = await res.json();
 
@@ -145,7 +145,7 @@ const UserInfoCard = () => {
 
   const handleDelete = async (item) => {
     setImage(
-      "https://t4.ftcdn.net/jpg/05/11/55/91/360_F_511559113_UTxNAE1EP40z1qZ8hIzGNrB0LwqwjruK.jpg",
+      "https://t4.ftcdn.net/jpg/05/11/55/91/360_F_511559113_UTxNAE1EP40z1qZ8hIzGNrB0LwqwjruK.jpg"
     );
   };
 

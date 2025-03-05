@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {Form, Input} from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input } from "antd";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import {Button} from "react-bootstrap";
-import {openNotification} from "../../component/notification";
+import { Button } from "react-bootstrap";
+import { openNotification } from "../../component/notification";
 import axios from "axios";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StrictLoginSSO = () => {
   // init value
@@ -48,7 +48,7 @@ const StrictLoginSSO = () => {
   const handleFormSubmit = async () => {
     const { phoneNum, idenCard, checkbox } = formData;
     if (!phoneNum || !idenCard || !checkbox) {
-      openNotification(false, "Please fill all the fields");
+      openNotification("error", "Please fill all the fields");
     }
     const data = {
       ...formData,
@@ -57,13 +57,13 @@ const StrictLoginSSO = () => {
     try {
       const res = await axios.post(
         `${BE_PORT}/api/auth/strict-signin-sso`,
-        data,
+        data
       );
       if (res.status === 200) {
-        openNotification(true, "Success register");
+        openNotification("success", "Success register");
         navigate("/owner");
       } else {
-        openNotification(false, "You already have account", res.data.message);
+        openNotification("error", "You already have account", res.data.message);
       }
     } catch (e) {
       console.log("Error in StrictSSO", e.message);

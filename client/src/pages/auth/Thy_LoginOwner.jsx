@@ -1,15 +1,15 @@
-import React, {useContext, useState} from "react";
-import {Form, Input, Tooltip} from "antd";
-import {Button} from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
-import {FaFacebookF, FaGoogle} from "react-icons/fa";
-import {MdOutlineEmail} from "react-icons/md";
+import React, { useContext, useState } from "react";
+import { Form, Input, Tooltip } from "antd";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { FaFacebookF, FaGoogle } from "react-icons/fa";
+import { MdOutlineEmail } from "react-icons/md";
 import axios from "axios";
-import {AuthContext} from "../../hooks/auth.context";
-import {openNotification} from "../../component/notification";
-import {motion} from "framer-motion";
+import { AuthContext } from "../../hooks/auth.context";
+import { openNotification } from "../../component/notification";
+import { motion } from "framer-motion";
 import ChangeLangButton from "../../component/ChangeLangButton";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const LogInOwner = () => {
   const { t } = useTranslation();
@@ -41,17 +41,17 @@ const LogInOwner = () => {
     const { email, password } = formData;
 
     if (!email || !password) {
-      openNotification(false, "Please fill all the fields");
+      openNotification("error", "Please fill all the fields");
       return;
     }
 
     try {
       const response = await axios.post(
         `${BE_PORT}/api/auth/signInOwner`,
-        formData,
+        formData
       );
       if (response.status === 200) {
-        openNotification(true, "Success login");
+        openNotification("success", "Success login");
         setAuth({
           isAuthenticated: true,
           user: {
@@ -66,7 +66,7 @@ const LogInOwner = () => {
       }
     } catch (e) {
       console.log(e);
-      openNotification(false, "Failed to register", e.response.data.message);
+      openNotification("error", "Failed to register", e.response.data.message);
     }
   };
 

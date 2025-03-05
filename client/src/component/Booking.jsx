@@ -1,17 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {Alert, Button, Col, DatePicker, Dropdown, Input, Row, Spin,} from "antd";
-import {CalendarOutlined} from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Button,
+  Col,
+  DatePicker,
+  Dropdown,
+  Input,
+  Row,
+  Spin,
+} from "antd";
+import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import {useCount, useGet} from "../hooks/hooks";
-import {openNotification} from "./notification";
+import { useCount, useGet } from "../hooks/hooks";
+import { openNotification } from "./notification";
 import axios from "axios";
 import isBetween from "dayjs/plugin/isBetween";
-import {useDispatch} from "react-redux";
-import {setSearchResult} from "../hooks/redux/searchSlice";
-import {setInputDay} from "../hooks/redux/inputDaySlice";
-import {useNavigate} from "react-router-dom";
-import {useTranslation} from "react-i18next";
+import { useDispatch } from "react-redux";
+import { setSearchResult } from "../hooks/redux/searchSlice";
+import { setInputDay } from "../hooks/redux/inputDaySlice";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 
@@ -102,16 +111,16 @@ const Booking = ({ tailwind_prop }) => {
   const [filteredCities, setFilteredCities] = useState([]);
   const BE_PORT = import.meta.env.VITE_BE_PORT;
   const { data, error, loading } = useGet(
-    `${BE_PORT}/api/hotelList/hotelCities`,
+    `${BE_PORT}/api/hotelList/hotelCities`
   );
   useEffect(() => {
     if (data) {
       const filteredCity = Array.from(
         new Set(
           data.cities.filter((city) =>
-            city.toLowerCase().includes(selectedCity.toLowerCase()),
-          ),
-        ),
+            city.toLowerCase().includes(selectedCity.toLowerCase())
+          )
+        )
       );
       setFilteredCities(filteredCity);
       console.log(filteredCity);
@@ -156,9 +165,9 @@ const Booking = ({ tailwind_prop }) => {
     const people = aCount + cCount;
     if (!selectedCity || !dayStart || !dayEnd || !people) {
       return openNotification(
-        false,
+        "error",
         "Missing information",
-        "Please fill out all information before searching",
+        "Please fill out all information before searching"
       );
     }
 
@@ -170,7 +179,7 @@ const Booking = ({ tailwind_prop }) => {
         dayStart: formattedDayStart,
         dayEnd: formattedDayEnd,
         city: selectedCity,
-      }),
+      })
     );
     console.log(formattedDayStart);
     console.log(formattedDayEnd);
@@ -185,7 +194,7 @@ const Booking = ({ tailwind_prop }) => {
     try {
       const res = await axios.post(
         `${BE_PORT}/api/hotelList/query`,
-        searchData,
+        searchData
       );
       console.log(res.data);
       if (
@@ -199,11 +208,11 @@ const Booking = ({ tailwind_prop }) => {
             hotelData: res.data.hotelData,
             roomData: res.data.roomData,
             countRoom: res.data.countRoom,
-          }),
+          })
         );
         navigate("/booking");
       } else {
-        openNotification(false, "Error", res.data.message);
+        openNotification("error", "Error", res.data.message);
       }
     } catch (e) {
       console.log(e);

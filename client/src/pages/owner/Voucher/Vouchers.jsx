@@ -1,11 +1,20 @@
-import React, {useEffect, useState} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
-import {Button, Form, Input, InputNumber, Modal, Popconfirm, Space, Typography,} from "antd";
-import {openNotification} from "../../../component/notification";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Space,
+  Typography,
+} from "antd";
+import { openNotification } from "../../../component/notification";
 import TableVoucher from "../../../component/TableVoucher";
-import {useMediaQuery} from "react-responsive";
-import {Link, useNavigate} from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 
@@ -32,18 +41,18 @@ function Vouchers() {
             key: index,
             startDay: moment(
               startDay.toLocaleString("vi-VN").split(" ")[1],
-              "DD/MM/YYYY",
+              "DD/MM/YYYY"
             ).format("YYYY/MM/DD"),
             endDay: moment(
               endDay.toLocaleString("vi-VN").split(" ")[1],
-              "DD/MM/YYYY",
+              "DD/MM/YYYY"
             ).format("YYYY/MM/DD"),
           };
         });
         setListVoucher(dataList);
       })
       .catch((err) => {
-        openNotification(false, err.response.data.message, "");
+        openNotification("error", err.response.data.message, "");
         navigate("/");
       });
   }, [editKey]);
@@ -126,16 +135,16 @@ function Vouchers() {
             console.log(data);
             if (data.status) {
               setListVoucher(
-                listVoucher.filter((voucher) => voucher._id !== record._id),
+                listVoucher.filter((voucher) => voucher._id !== record._id)
               );
-              openNotification(true, data.message, "");
+              openNotification("success", data.message, "");
             }
           })
           .catch((err) => {
             openNotification(
-              false,
+              "error",
               "Delete voucher failed",
-              err.response.message,
+              err.response.message
             );
           });
       },
@@ -173,18 +182,18 @@ function Vouchers() {
 
         if (value.discount > 50) {
           openNotification(
-            false,
+            "error",
             "Update voucher failed",
-            "Discount must no more than 50% !",
+            "Discount must no more than 50% !"
           );
           return;
         }
 
         if (startDay.getMonth() > endDay.getMonth()) {
           openNotification(
-            false,
+            "error",
             "Update voucher failed",
-            "Month of end day must be greater than month of start day !",
+            "Month of end day must be greater than month of start day !"
           );
           return;
         }
@@ -194,9 +203,9 @@ function Vouchers() {
           endDay.getDate() - startDay.getDate() < 2
         ) {
           openNotification(
-            false,
+            "error",
             "Update voucher failed",
-            "Voucher must be valid for at least 2 days !",
+            "Voucher must be valid for at least 2 days !"
           );
           return;
         }
@@ -208,7 +217,7 @@ function Vouchers() {
           .then((res) => res.data)
           .then((data) => {
             if (data.status) {
-              openNotification(true, data.message, "");
+              openNotification("success", data.message, "");
               const newData = [...listVoucher];
               const index = newData.findIndex((item) => item.key === key);
               console.log(index);
@@ -225,9 +234,9 @@ function Vouchers() {
           })
           .catch((err) => {
             openNotification(
-              false,
+              "error",
               "Update voucher failed",
-              err.response.data.message,
+              err.response.data.message
             );
           });
       });

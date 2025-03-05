@@ -1,12 +1,26 @@
-import React, {useContext, useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {Alert, Button, Form, Image, Input, Modal, notification, Select, Spin,} from "antd";
-import {useGet} from "../../../hooks/hooks";
-import {AuthContext} from "../../../hooks/auth.context";
-import {addAmenity, addHotel, updateHotels,} from "../../../hooks/redux/hotelsSclice";
-import {useDispatch, useSelector} from "react-redux";
-import {openNotification} from "../../../component/notification";
+import {
+  Alert,
+  Button,
+  Form,
+  Image,
+  Input,
+  Modal,
+  notification,
+  Select,
+  Spin,
+} from "antd";
+import { useGet } from "../../../hooks/hooks";
+import { AuthContext } from "../../../hooks/auth.context";
+import {
+  addAmenity,
+  addHotel,
+  updateHotels,
+} from "../../../hooks/redux/hotelsSclice";
+import { useDispatch, useSelector } from "react-redux";
+import { openNotification } from "../../../component/notification";
 import ModalAmenities from "../../../component/ModalAmenities";
 
 const { Option } = Select;
@@ -182,7 +196,7 @@ const CreateHotel = ({ visible, handleCancel }) => {
         {
           method: "POST",
           body: formData,
-        },
+        }
       );
       const uploadedImageURL = await res.json();
       setImages((pre) => [...pre, uploadedImageURL.url]);
@@ -195,7 +209,7 @@ const CreateHotel = ({ visible, handleCancel }) => {
     const { phoneNum } = values;
 
     if (phoneNum.length != 10) {
-      openNotification(false, "Số điện thoại phải là 10 chữ số", "");
+      openNotification("error", "Số điện thoại phải là 10 chữ số", "");
       return;
     }
 
@@ -209,10 +223,10 @@ const CreateHotel = ({ visible, handleCancel }) => {
       try {
         const response = await axios.post(
           `${BE_PORT}/api/hotelList/updateHotel/${hotelSelected._id}`,
-          form,
+          form
         );
         if (response.data.status === "OK") {
-          openNotification(true, "Cập nhật thành công", "");
+          openNotification("success", "Cập nhật thành công", "");
           dispatch(updateHotels(response.data.data));
           handleCancel();
         } else {
@@ -232,10 +246,10 @@ const CreateHotel = ({ visible, handleCancel }) => {
       try {
         const response = await axios.post(
           `${BE_PORT}/api/hotelList/createHotel`,
-          form,
+          form
         );
         if (response.data.status === "OK") {
-          openNotification(true, "Thêm thành công", "");
+          openNotification("success", "Thêm thành công", "");
           dispatch(addHotel(form));
           handleCancel();
         } else {
@@ -247,9 +261,9 @@ const CreateHotel = ({ visible, handleCancel }) => {
           error.response?.data?.message || "Xảy ra lỗi không xác định.";
 
         openNotification(
-          false,
+          "error",
           "Thêm khách sạn thất bại",
-          error.response?.data?.message || "Lỗi hệ thống",
+          error.response?.data?.message || "Lỗi hệ thống"
         );
       }
     }

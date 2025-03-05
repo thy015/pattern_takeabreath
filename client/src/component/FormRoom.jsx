@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {Form, Image, Input, InputNumber, Modal, Select} from "antd";
-import {useDispatch, useSelector} from "react-redux";
-import {openNotification} from "./notification";
-import {addRoom, updateRooms} from "../hooks/redux/roomsSlice";
-import {setHotels} from "../hooks/redux/hotelsSclice";
-import {useForm} from "antd/es/form/Form";
+import React, { useEffect, useState } from "react";
+import { Form, Image, Input, InputNumber, Modal, Select } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { openNotification } from "./notification";
+import { addRoom, updateRooms } from "../hooks/redux/roomsSlice";
+import { setHotels } from "../hooks/redux/hotelsSclice";
+import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 
 function FormRoom({ isVisible, close }) {
@@ -85,7 +85,7 @@ function FormRoom({ isVisible, close }) {
         {
           method: "POST",
           body: formData,
-        },
+        }
       );
       const uploadedImageURL = await res.json();
       setImages((pre) => [...pre, uploadedImageURL.url]);
@@ -103,7 +103,7 @@ function FormRoom({ isVisible, close }) {
   const onFinish = async (values) => {
     const { money } = values;
     if (money < 0) {
-      openNotification(false, "Giá tiền không được âm !", "");
+      openNotification("error", "Giá tiền không được âm !", "");
       return;
     }
     const formInput = {
@@ -121,22 +121,22 @@ function FormRoom({ isVisible, close }) {
             nameHotel: data.data.hotelID.hotelName,
           };
           dispatch(addRoom(room));
-          openNotification(true, "Tạo phòng thành công", "");
+          openNotification("success", "Tạo phòng thành công", "");
           close();
         })
         .catch((err) => {
           console.log(err);
           openNotification(
-            false,
+            "error",
             "Tạo phòng thất bại",
-            err.response?.data?.message ?? "",
+            err.response?.data?.message ?? ""
           );
         });
     } else {
       axios
         .post(
           `${BE_PORT}/api/hotelList/updateRoom/${selectedRoom._id}`,
-          formInput,
+          formInput
         )
         .then((res) => res.data)
         .then((data) => {
@@ -145,15 +145,15 @@ function FormRoom({ isVisible, close }) {
             update: data.data,
           };
           dispatch(updateRooms(setValue));
-          openNotification(true, "Cập nhật phòng thành công", "");
+          openNotification("success", "Cập nhật phòng thành công", "");
           close();
         })
         .catch((err) => {
           console.log(err);
           openNotification(
-            false,
+            "error",
             "Tạo phòng thất bại",
-            err.response.data.message,
+            err.response.data.message
           );
         });
     }

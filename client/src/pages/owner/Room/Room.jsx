@@ -1,13 +1,22 @@
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {Link} from "react-router-dom";
-import {Button, DatePicker, Input, Popconfirm, Select, Space, Table, Typography,} from "antd";
-import {useMediaQuery} from "react-responsive";
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import {
+  Button,
+  DatePicker,
+  Input,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  Typography,
+} from "antd";
+import { useMediaQuery } from "react-responsive";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FormRoom from "../../../component/FormRoom";
 import axios from "axios";
-import {openNotification} from "../../../component/notification";
+import { openNotification } from "../../../component/notification";
 import ViewComment from "../../../component/ViewComment";
 import {
   deleteRoom,
@@ -46,7 +55,7 @@ function Room() {
       })
       .catch((err) => {
         console.log(err);
-        openNotification(false, "Lấy dữ liệu thất bại", err.messagse);
+        openNotification("error", "Lấy dữ liệu thất bại", err.messagse);
       });
 
     axios
@@ -83,14 +92,14 @@ function Room() {
       .then((res) => res.data)
       .then((data) => {
         dispatch(deleteRoom(record._id));
-        openNotification(true, "Vô hiệu hóa phòng thành công", "");
+        openNotification("success", "Vô hiệu hóa phòng thành công", "");
       })
       .catch((err) => {
         console.log(err);
         openNotification(
-          false,
+          "error",
           "Vô hiệu hóa phòng thất bại !",
-          err.response?.data?.message ?? "Vui long thử lại sau",
+          err.response?.data?.message ?? "Vui long thử lại sau"
         );
       });
   };
@@ -138,7 +147,11 @@ function Room() {
         })
         .catch((err) => {
           console.log(err);
-          openNotification(false, "Lọc thất bại", err.response?.data?.message);
+          openNotification(
+            "error",
+            "Lọc thất bại",
+            err.response?.data?.message
+          );
         });
     }
   };

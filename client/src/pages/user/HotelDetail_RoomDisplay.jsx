@@ -155,7 +155,7 @@ const HotelDetail_RoomDisplay = ({ roomData, hotel }) => {
                             handleReserve(room, returnCount, totalPrice);
                           } else {
                             openNotification(
-                              false,
+                              "error",
                               "Reserve failed",
                               "Please log in or register account !",
                             );

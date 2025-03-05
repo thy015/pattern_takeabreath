@@ -1,16 +1,16 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from "react";
 
-import {Form, Input, Tooltip} from "antd";
-import {Button} from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {FaFacebookF, FaGoogle} from "react-icons/fa";
-import {MdOutlineEmail} from "react-icons/md";
-import {motion} from "framer-motion";
+import { Form, Input, Tooltip } from "antd";
+import { Button } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { FaFacebookF, FaGoogle } from "react-icons/fa";
+import { MdOutlineEmail } from "react-icons/md";
+import { motion } from "framer-motion";
 import axios from "axios";
-import {openNotification} from "../../component/notification";
-import {AuthContext} from "../../hooks/auth.context";
+import { openNotification } from "../../component/notification";
+import { AuthContext } from "../../hooks/auth.context";
 import ChangeLangButton from "../../component/ChangeLangButton";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -40,19 +40,19 @@ const Login = () => {
     return String(email)
       .toLowerCase()
       .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       );
   };
   const handleFormSubmit = async () => {
     const { email, password } = formData;
 
     if (!email || !password) {
-      openNotification(false, "Please fill all the fields");
+      openNotification("error", "Please fill all the fields");
       return;
     }
 
     if (!validateEmail(email)) {
-      openNotification(false, "Invalid email format");
+      openNotification("error", "Invalid email format");
       return;
     }
 
@@ -70,13 +70,13 @@ const Login = () => {
               role: res?.data?.role ?? "",
             },
           });
-          openNotification(true, "Login Successful", "");
+          openNotification("success", "Login Successful", "");
           navigate(res.data.redirect);
         }
       })
       .catch((err) => {
         console.log(err);
-        openNotification(false, "Login Failed", err.response.data.message);
+        openNotification("error", "Login Failed", err.response.data.message);
       });
   };
 

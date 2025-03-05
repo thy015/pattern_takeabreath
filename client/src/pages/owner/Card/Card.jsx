@@ -1,16 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
-import {Button, Form, Input, Modal, Popconfirm, Table} from "antd";
-import {useMediaQuery} from "react-responsive";
-import {Link} from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Button, Form, Input, Modal, Popconfirm, Table } from "antd";
+import { useMediaQuery } from "react-responsive";
+import { Link } from "react-router-dom";
 import FormCard from "../../../component/FormCard";
 import dayjs from "dayjs";
 import axios from "axios";
-import {setCards, setWoWoDetail} from "../../../hooks/redux/ownerSlice";
-import {openNotification} from "../../../component/notification";
-import {AuthContext} from "../../../hooks/auth.context";
+import { setCards, setWoWoDetail } from "../../../hooks/redux/ownerSlice";
+import { openNotification } from "../../../component/notification";
+import { AuthContext } from "../../../hooks/auth.context";
 
 function Card() {
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ function Card() {
         dispatch(setCards(cards));
       })
       .catch(() => {
-        openNotification(false, "Không có thẻ", "");
+        openNotification("error", "Không có thẻ", "");
       });
   }, []);
 
@@ -54,7 +54,7 @@ function Card() {
       })
       .then((res) => res.data)
       .then((data) => {
-        openNotification(true, "Gỡ thẻ thành công", "");
+        openNotification("success", "Gỡ thẻ thành công", "");
         const cards = data.cards.map((item) => ({
           ...item,
           key: item._id,
@@ -63,7 +63,7 @@ function Card() {
         dispatch(setCards(cards));
       })
       .catch(() => {
-        openNotification(false, "Gỡ thẻ không thành công");
+        openNotification("error", "Gỡ thẻ không thành công");
       });
   };
   // wowo wallet
@@ -71,7 +71,7 @@ function Card() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${BE_PORT}/api/wallet/wowoListCard?ownerID=${id}`,
+          `${BE_PORT}/api/wallet/wowoListCard?ownerID=${id}`
         );
         const result = await response.json();
         const formattedData = result.cards.map((card) => ({
@@ -97,18 +97,18 @@ function Card() {
     try {
       await axios
         .post(
-          `${BE_PORT}/api/wallet/deleteWoWoCard?ownerID=${id}&cardWoWoID=${record.cardWoWoID}`,
+          `${BE_PORT}/api/wallet/deleteWoWoCard?ownerID=${id}&cardWoWoID=${record.cardWoWoID}`
         )
         .then((res) => res.data)
         .then(() => {
           openNotification(
-            true,
+            "success",
             "Gỡ thẻ thành công",
-            "Nếu không thấy thay đổi bạn có thể reset lại trang",
+            "Nếu không thấy thay đổi bạn có thể reset lại trang"
           );
         })
         .catch(() => {
-          openNotification(false, "Gỡ thẻ không thành công");
+          openNotification("error", "Gỡ thẻ không thành công");
         });
     } catch (err) {
       console.log(err.message);
@@ -117,7 +117,7 @@ function Card() {
 
   const handleClickDetailWoWoCard = async (record) => {
     const response = await axios.post(
-      `${BE_PORT}/api/wallet/detailWoWoCard?cardWoWoID=${record.cardWoWoID}`,
+      `${BE_PORT}/api/wallet/detailWoWoCard?cardWoWoID=${record.cardWoWoID}`
     );
     dispatch(setWoWoDetail(response.data));
     setIsWoWoCardDetailPopUp((prev) => !prev);
@@ -125,7 +125,7 @@ function Card() {
 
   const handleClickTransferWoWoCard = async (record) => {
     const response = await axios.post(
-      `${BE_PORT}/api/wallet/detailWoWoCard?cardWoWoID=${record.cardWoWoID}`,
+      `${BE_PORT}/api/wallet/detailWoWoCard?cardWoWoID=${record.cardWoWoID}`
     );
     dispatch(setWoWoDetail(response.data));
     setWoWoTransferMoneyPopUp((prev) => !prev);
@@ -142,20 +142,20 @@ function Card() {
     try {
       const { cardWoWoID, amount } = formData;
       if (amount > wowoCardDetail?.walletDetails?.balance) {
-        return openNotification(false, "You dont have enough money");
+        return openNotification("error", "You dont have enough money");
       }
       const response = await axios.post(
-        `${BE_PORT}/api/wallet/transferWoWoMoney?cardWoWoID=${cardWoWoID}&amount=${amount}`,
+        `${BE_PORT}/api/wallet/transferWoWoMoney?cardWoWoID=${cardWoWoID}&amount=${amount}`
       );
       if (response.status === 200) {
         openNotification("Success transfer money");
         setWoWoTransferMoneyPopUp(false);
       } else {
-        openNotification(false, "Unexpected error in cancel money");
+        openNotification("error", "Unexpected error in cancel money");
         console.log("response.message", response.message);
       }
     } catch (e) {
-      openNotification(false, "Unexpected error in cancel money", e.message);
+      openNotification("error", "Unexpected error in cancel money", e.message);
     }
   };
 

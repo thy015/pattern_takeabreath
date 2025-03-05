@@ -42,7 +42,7 @@ function ViewComment({ visible, close, record }) {
         .then((res) => setComments(res.data.comments))
         .catch((err) => {
           openNotification(
-            false,
+            "error",
             "Lấy dữ liệu thất bại!",
             err?.response?.data?.message ?? "",
           );

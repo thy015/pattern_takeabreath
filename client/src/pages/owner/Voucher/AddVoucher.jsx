@@ -1,10 +1,17 @@
-import {Button, ConfigProvider, DatePicker, Form, Input, InputNumber,} from "antd";
-import React, {useState} from "react";
-import {useForm} from "antd/es/form/Form";
-import {Link} from "react-router-dom";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCaretLeft} from "@fortawesome/free-solid-svg-icons";
-import {openNotification} from "../../../component/notification";
+import {
+  Button,
+  ConfigProvider,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+} from "antd";
+import React, { useState } from "react";
+import { useForm } from "antd/es/form/Form";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
+import { openNotification } from "../../../component/notification";
 import axios from "axios";
 
 function AddVoucher() {
@@ -34,9 +41,9 @@ function AddVoucher() {
     if (dateEnd.getMonth() == dateStart.getMonth()) {
       if (dateLast < 2) {
         openNotification(
-          false,
+          "error",
           "Add voucher fail",
-          "Voucher must be valid for at least 2 days !",
+          "Voucher must be valid for at least 2 days !"
         );
         setStatus("error");
         return;
@@ -63,7 +70,11 @@ function AddVoucher() {
         console.log(data);
       })
       .catch((e) => {
-        openNotification(false, "Add voucher failed", e.response.data.message);
+        openNotification(
+          "error",
+          "Add voucher failed",
+          e.response.data.message
+        );
         console.log(e);
       });
   };

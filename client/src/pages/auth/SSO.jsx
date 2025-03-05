@@ -1,9 +1,9 @@
-import React, {useContext, useEffect} from "react";
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {useJwt}                       from "react-jwt";
-import {AuthContext}                  from "../../hooks/auth.context";
-import axios                          from "axios";
-import {openNotification}             from "../../component/notification";
+import React, { useContext, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useJwt } from "react-jwt";
+import { AuthContext } from "../../hooks/auth.context";
+import axios from "axios";
+import { openNotification } from "../../component/notification";
 
 const SSO = () => {
   const { auth, setAuth } = useContext(AuthContext);
@@ -24,7 +24,7 @@ const SSO = () => {
             .post(
               `${BE_PORT}/api/auth/login-with-sso`,
               { decodedToken },
-              { withCredentials: true },
+              { withCredentials: true }
             )
             .then((res) => {
               setAuth({
@@ -46,7 +46,7 @@ const SSO = () => {
           const res = await axios.post(
             `${BE_PORT}/api/auth/check-existed-partner`,
             { decodedToken },
-            { withCredentials: true },
+            { withCredentials: true }
           );
           // chưa đăng kí
           if (res.status === 202) {
@@ -63,10 +63,10 @@ const SSO = () => {
                 role: res?.data?.role ?? "",
               },
             });
-            openNotification(true, "Success login");
+            openNotification("success", "Success login");
             navigate("/owner");
           } else {
-            openNotification(false, "Cant resolve SSO FE", res.data.message);
+            openNotification("error", "Cant resolve SSO FE", res.data.message);
           }
         }
       }

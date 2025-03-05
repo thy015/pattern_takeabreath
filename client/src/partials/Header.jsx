@@ -1,13 +1,13 @@
-import {Button, Col, Dropdown, Row} from "antd";
-import React, {useContext, useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft, faBars} from "@fortawesome/free-solid-svg-icons";
+import { Button, Col, Dropdown, Row } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faBars } from "@fortawesome/free-solid-svg-icons";
 import "../index.scss";
-import {AuthContext} from "../hooks/auth.context";
+import { AuthContext } from "../hooks/auth.context";
 import axios from "axios";
-import {openNotification} from "../component/notification";
-import {useTranslation} from "react-i18next";
+import { openNotification } from "../component/notification";
+import { useTranslation } from "react-i18next";
 import ChangeLangButton from "../component/ChangeLangButton";
 import styled from "styled-components";
 
@@ -55,7 +55,7 @@ const Header = ({ children }) => {
       .then((res) => {
         if (res.data.logout) {
           console.log(res.data);
-          openNotification(true, "Logout Successful !");
+          openNotification("success", "Logout Successful !");
           setAuth({
             isAuthenticated: false,
             user: {

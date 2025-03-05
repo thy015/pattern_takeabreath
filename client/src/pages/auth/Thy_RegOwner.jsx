@@ -1,21 +1,21 @@
-import React, {useState} from "react";
-import {Checkbox, Form, Input, Tooltip} from "antd";
-import {Button} from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
-import {FaAddressCard, FaFacebookF, FaGoogle} from "react-icons/fa";
-import {MdOutlineEmail} from "react-icons/md";
-import {FaPhoneFlip, FaUser} from "react-icons/fa6";
+import React, { useState } from "react";
+import { Checkbox, Form, Input, Tooltip } from "antd";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { FaAddressCard, FaFacebookF, FaGoogle } from "react-icons/fa";
+import { MdOutlineEmail } from "react-icons/md";
+import { FaPhoneFlip, FaUser } from "react-icons/fa6";
 import axios from "axios";
-import {openNotification} from "../../component/notification";
-import {motion} from "framer-motion";
-import {useTranslation} from "react-i18next";
+import { openNotification } from "../../component/notification";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import ChangeLangButton from "../../component/ChangeLangButton";
 
 const validateEmail = (email) => {
   return String(email)
     .toLowerCase()
     .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
 
@@ -55,45 +55,45 @@ const RegisterOwner = () => {
     const { email, password, name, phone, agreeTerms, idenCard } = formData;
 
     if (!email || !password || !name || !phone || !idenCard) {
-      openNotification(false, "Please fill all the fields");
+      openNotification("error", "Please fill all the fields");
       return;
     }
 
     if (!validateEmail(email)) {
-      openNotification(false, "Invalid email format");
+      openNotification("error", "Invalid email format");
       return;
     }
 
     if (password.length <= 8) {
-      openNotification(false, "Password should be at least 8 characters");
+      openNotification("error", "Password should be at least 8 characters");
       return;
     }
 
     if (phone.length !== 10 || !phone.startsWith("0")) {
-      openNotification(false, "Phone must be 10 digits and start with 0");
+      openNotification("error", "Phone must be 10 digits and start with 0");
       return;
     }
     if (idenCard.length !== 12) {
-      openNotification(false, "Invalid card");
+      openNotification("error", "Invalid card");
       return;
     }
     if (!agreeTerms) {
-      openNotification(false, "You must agree to the terms of service");
+      openNotification("error", "You must agree to the terms of service");
       return;
     }
     try {
       const response = await axios.post(
         `${BE_PORT}/api/auth/signUpOwner`,
-        formData,
+        formData
       );
       console.log(response.data);
       if (response.status === 200) {
-        openNotification(true, "Success register");
+        openNotification("success", "Success register");
         navigate("/loginOwner");
       }
     } catch (e) {
       console.log(e + "Error passing form data");
-      openNotification(false, "Failed to register", e.response.data.message);
+      openNotification("error", "Failed to register", e.response.data.message);
     }
   };
 

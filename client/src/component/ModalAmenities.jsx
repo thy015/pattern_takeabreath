@@ -59,7 +59,7 @@ function ModalAmenities({ visible, close }) {
       totalSelections - preSeclectionCount + currentSelectionCount;
     if (newTotal > 10) {
       openNotification(
-        false,
+        "error",
         "Thêm tiện ích thất bại",
         "Chỉ chọn tối đa 10 tiện ích",
       );

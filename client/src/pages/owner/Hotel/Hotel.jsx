@@ -1,14 +1,19 @@
-import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {useMediaQuery} from "react-responsive";
-import {Button, Input, Popconfirm, Space, Table, Typography} from "antd";
-import {useDispatch, useSelector} from "react-redux";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
-import {CreateHotel} from "../../admin/Hotels/CreateHotel";
-import {deleteHotel, searchHotels, seletedHotel, setHotels,} from "../../../hooks/redux/hotelsSclice";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
+import { Button, Input, Popconfirm, Space, Table, Typography } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { CreateHotel } from "../../admin/Hotels/CreateHotel";
+import {
+  deleteHotel,
+  searchHotels,
+  seletedHotel,
+  setHotels,
+} from "../../../hooks/redux/hotelsSclice";
 import axios from "axios";
-import {openNotification} from "../../../component/notification";
+import { openNotification } from "../../../component/notification";
 
 function Hotel() {
   const dispatch = useDispatch();
@@ -37,14 +42,14 @@ function Hotel() {
       .then((res) => res.data)
       .then((data) => {
         console.log(data);
-        openNotification(true, "Vô hiệu hóa khách sạn thành công !", "");
+        openNotification("success", "Vô hiệu hóa khách sạn thành công !", "");
         dispatch(deleteHotel(record._id));
       })
       .catch((err) => {
         openNotification(
-          false,
+          "error",
           "Vô hiệu hóa khách sạn thất bại !",
-          err.response?.data?.message ?? "",
+          err.response?.data?.message ?? ""
         );
       });
   };

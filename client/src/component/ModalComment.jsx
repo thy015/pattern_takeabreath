@@ -1,9 +1,9 @@
-import {Form, Input, Modal, Rate} from "antd";
-import {useDispatch} from "react-redux";
+import { Form, Input, Modal, Rate } from "antd";
+import { useDispatch } from "react-redux";
 import axios from "axios";
 import React from "react";
-import {openNotification} from "./notification";
-import {addComment} from "../hooks/redux/roomsSlice";
+import { openNotification } from "./notification";
+import { addComment } from "../hooks/redux/roomsSlice";
 
 function ModalComment({ open, close, selectedInvoice }) {
   const [form] = Form.useForm();
@@ -24,16 +24,16 @@ function ModalComment({ open, close, selectedInvoice }) {
       })
       .then((res) => res.data)
       .then((data) => {
-        openNotification(true, data.message, "");
+        openNotification("success", data.message, "");
         dispatch(addComment(data.comment));
         close();
       })
       .catch((err) => {
         console.log(err);
         openNotification(
-          false,
+          "error",
           "Đánh giá thất bại",
-          err.response?.data?.message,
+          err.response?.data?.message
         );
       });
   };
