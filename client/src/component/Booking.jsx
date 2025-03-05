@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import SearchDataBuilder from "../pattern/builder/utils/SearchDataBuilder";
 const Booking = ({tailwind_prop}) => {
   const {t}=useTranslation()
 // onSearchResults
@@ -178,12 +179,15 @@ const Booking = ({tailwind_prop}) => {
     console.log(formattedDayStart)
     console.log(formattedDayEnd)
 
-    const searchData = {
-      city: selectedCity,
-      dayStart: formattedDayStart,
-      dayEnd: formattedDayEnd,
-      people: people
-    }
+    //Pattern Builder
+    const searchData = new SearchDataBuilder()
+    .setCity(selectedCity)
+    .setDayStart(formattedDayStart)
+    .setDayEnd(formattedDayEnd)
+    .setPeople(people)
+    .build();
+
+
     console.log(searchData)
     try {
       const res = await axios.post(`${BE_PORT}/api/hotelList/query`, searchData);

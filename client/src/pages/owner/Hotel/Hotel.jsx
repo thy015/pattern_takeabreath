@@ -10,6 +10,10 @@ import { CreateHotel } from '../../admin/Hotels/CreateHotel'
 import { setHotels, deleteHotel, seletedHotel, searchHotels } from '../../../hooks/redux/hotelsSclice';
 import axios from 'axios'
 import { openNotification } from '../../../hooks/notification';
+import DeleteHotelCommand from '../../../pattern/command/DeleteHotelCommand';
+import UpdateHotelCommand from '../../../pattern/command/UpdateHotelCommand';
+import HotelServices from '../../../pattern/services/HotelServices';
+
 
 function Hotel() {
     const dispatch = useDispatch()
@@ -33,24 +37,16 @@ function Hotel() {
             .catch(err => console.log("HOTEL", err))
     }, [])
 
-    const handleDelete = (record) => {
-        axios.delete(`${BE_PORT}/api/hotelList/deleteHotel/${record._id}`)
-            .then(res => res.data)
-            .then(data => {
-                console.log(data)
-                openNotification(true, "Vô hiệu hóa khách sạn thành công !", "")
-                dispatch(deleteHotel(record._id))
-            })
-            .catch(err => {
-                openNotification(false, "Vô hiệu hóa khách sạn thất bại !", err.response?.data?.message ?? "")
-            })
-    }
+     const handleDelete = (record) => {
+    const command = new DeleteHotelCommand(HotelService, record._id, dispatch);
+    command.execute();
+  };
 
-    const handleUpdate = (record) => {
-        console.log(record)
-        dispatch(seletedHotel(record))
-        setVisible(true)
-    }
+   const handleUpdate = (record) => {
+    const command = new UpdateHotelCommand(dispatch, record);
+    command.execute();
+    setVisible(true);
+  };
 
     const columns = [
         {
