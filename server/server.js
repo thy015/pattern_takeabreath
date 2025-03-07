@@ -12,6 +12,7 @@ const http = require("http");
 const swaggerUI=require('swagger-ui-express')
 const swaggerSpec=require('./docs/swagger')
 const {useSSOCallback} = require('@htilssu/wowo');
+const Database = require("./database"); // Import Singleton MongoDB Connection
 
 const HotelListRouter = require("./src/routes/HotelList/hotelList.route");
 const RoomListRouter = require("./src/routes/RoomList/roomList.route");
@@ -68,18 +69,6 @@ app.use("/api/cancelReq", reqCancelRouter);
 app.use("/api/voucher", VoucherRoute);
 app.use('/api/email',MailRoute);
 app.use('/api/wallet',walletRouter);
-//mongo connect
-
-mongoose
-    .connect(
-        `mongodb+srv://thymai1510:${process.env.MONGO_DB}@cluster0.ibhghsi.mongodb.net/?appName=Cluster0`
-    )
-    .then(() => {
-      console.log("Connect successfully");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 
 app.use(express.static("public"));
 
@@ -94,3 +83,4 @@ const server = http.createServer(app);
 server.listen(PORT, () => {
   console.log(`Now streaming on ${PORT}`);
 });
+

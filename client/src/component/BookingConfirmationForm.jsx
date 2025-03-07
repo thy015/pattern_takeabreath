@@ -28,6 +28,118 @@ import { useForm } from "antd/es/form/Form";
 import { setInvoiceCount,cleanInvoice } from "../hooks/redux/revenueSlice";
 import { useTranslation } from "react-i18next";
 import {openNotification} from "../hooks/notification";
+import {useNavigate} from "react-router-dom";
+import {setInvoiceID, setVoucherApplied} from "../hooks/redux/inputDaySlice";
+import {useForm} from "antd/es/form/Form";
+import {cleanInvoice, setInvoiceCount} from "../hooks/redux/revenueSlice";
+import {useTranslation} from "react-i18next";
+
+// Payment Strategy Interface
+class PaymentStrategy {
+  async processPayment(BE_PORT, bookingData) {
+    throw new Error("Method not implemented");
+  }
+  
+  renderPaymentUI() {
+    return null;
+  }
+}
+
+// PayPal Payment Strategy
+class PayPalPaymentStrategy extends PaymentStrategy {
+  async processPayment(BE_PORT, bookingData) {
+    const response = await axios.post(`${BE_PORT}/api/booking`, bookingData);
+    return response;
+  }
+  
+  renderPaymentUI() {
+    return (
+      <>
+        <p>Please <span className="text-success">click</span> to confirm your payment in the <span className="text-success">time</span> allotted.</p>
+        <PayPalButton />
+      </>
+    );
+  }
+}
+
+// Momo Payment Strategy
+class MomoPaymentStrategy extends PaymentStrategy {
+  async processPayment(BE_PORT, bookingData) {
+    const response = await axios.post(`${BE_PORT}/api/booking`, bookingData);
+    return response;
+  }
+  
+  renderPaymentUI() {
+    return (
+      <p>Please confirm your payment through the Momo app.</p>
+    );
+  }
+}
+
+// Wowo Payment Strategy
+class WowoPaymentStrategy extends PaymentStrategy {
+  async processPayment(BE_PORT, bookingData) {
+    const response = await axios.post(`${BE_PORT}/api/booking`, bookingData);
+    
+    // Handle Wowo specific redirect
+    if (response.status === 201) {
+      const checkoutUrl = response.data.orderResponse.checkoutUrl;
+      if (checkoutUrl) {
+        window.open(checkoutUrl, "_blank");
+      }
+    }
+    
+    return response;
+  }
+  
+  renderPaymentUI() {
+    return (
+      <>
+        <p>Please <span className="text-success">click</span> to confirm your payment in the <span className="text-success">time</span> allotted.</p>
+        <img
+          alt="wowopic"
+          className="flex-center w-full h-[400px]"
+          src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcS1WwRPG59Xn5KZL5YsZNvHbo0Sds6gCzCYbK0tG7fAO8mh1t_H"
+        />
+      </>
+    );
+  }
+}
+
+// Payment Context
+class PaymentContext {
+  constructor(strategy) {
+    this.strategy = strategy;
+  }
+  
+  setStrategy(strategy) {
+    this.strategy = strategy;
+  }
+  
+  async processPayment(BE_PORT, bookingData) {
+    return await this.strategy.processPayment(BE_PORT, bookingData);
+  }
+  
+  renderPaymentUI() {
+    return this.strategy.renderPaymentUI();
+  }
+}
+
+// Factory for creating payment strategies
+const PaymentStrategyFactory = {
+  createStrategy(paymentMethod) {
+    switch(paymentMethod) {
+      case "paypal":
+        return new PayPalPaymentStrategy();
+      case "momo":
+        return new MomoPaymentStrategy();
+      case "wowo":
+        return new WowoPaymentStrategy();
+      default:
+        throw new Error(`Unsupported payment method: ${paymentMethod}`);
+    }
+  }
+};
 
 function BookingConfirmationForm({ isShow, onCancel,hotel }) {
   const {t}=useTranslation();
@@ -35,6 +147,7 @@ function BookingConfirmationForm({ isShow, onCancel,hotel }) {
   const BE_PORT=import.meta.env.VITE_BE_PORT
   const [form] = useForm();
   const [payment, setPayment] = useState("");
+  const [paymentContext, setPaymentContext] = useState(new PaymentContext(null));
   const [vouchers, setVouchers] = useState([]);
   const [paymentModalVisible, setPaymentModalVisible] = useState(false)
   const [isFormValid, setIsFormValid] = useState(false)
@@ -112,6 +225,11 @@ useEffect(() => {
   const handlePaymentChange = (e) => {
     const selectedValue = e.target.value;
     setPayment(selectedValue);
+    
+    // Create and set the appropriate payment strategy
+    const paymentStrategy = PaymentStrategyFactory.createStrategy(selectedValue);
+    paymentContext.setStrategy(paymentStrategy);
+    setPaymentContext(paymentContext);
 
     if (paymentRef.current) {
       paymentRef.current.scrollIntoView
@@ -143,6 +261,12 @@ useEffect(() => {
         await axios.post(`${BE_PORT}/api/booking/deleteInvoiceWaiting`, { listID: listInvoiceID });
         dispatch(cleanInvoice())
         hanldeLogout()
+        message.error("Tài khoản của bạn đã bị khóa");
+        await axios.post(`${BE_PORT}/api/booking/deleteInvoiceWaiting`, {
+          listID: listInvoiceID,
+        });
+        dispatch(cleanInvoice());
+        handleLogout();
       } else {
         console.log(response)
         notification.error({
@@ -174,6 +298,26 @@ useEffect(() => {
       console.log(err)
     })
   }
+  const handleLogout = () => {
+    axios
+      .get(`${BE_PORT}/api/auth/logout`)
+      .then((res) => {
+        if (res.data.logout) {
+          setAuth({
+            isAuthenticated: false,
+            user: {
+              id: "",
+              email: "",
+              name: "",
+            },
+          });
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const checkFormValidity = async () => {
     try {
@@ -211,6 +355,7 @@ useEffect(() => {
     navigate('/mybooking')
     onCancel();
   };
+  
   const onFinish = async (values) => {
     const idHotel = selectedHotel._id;
     const idRoom = selectedRoom._id;
@@ -244,6 +389,21 @@ useEffect(() => {
       console.log("[RESPONSE]", response.data);
 
       // paypal
+      totalRoom: countRoom,
+    };
+    
+    // Create booking data object
+    const bookingData = {
+      idHotel,
+      idCus,
+      idRoom,
+      dataBooking,
+    };
+
+    try {
+      // Use strategy pattern to process payment
+      const response = await paymentContext.processPayment(BE_PORT, bookingData);
+      
       if (response.status === 200) {
         setCountOrders(response.data.data, response.data.invoiceID)
         // console.log('[Invoice ID]',response.data.invoiceID)
@@ -260,14 +420,23 @@ useEffect(() => {
           message.error("WoWo checkout URL is missing.");
         }
       } else if(response.status === 209) {
+        setCountOrders(response.data.data, response.data.invoiceID);
+        dispatch(setInvoiceID({ invoiceID: response.data.invoiceID }));
+        setPaymentModalVisible(true);
+      } else if (response.status === 209) {
         message.error("Booking failed", message.error(response.data.message));
       }
       else {
         message.error("Booking failed", message.error(response.data.message));
       }
+      
+      // Show payment modal regardless of the payment method
+      setPaymentModalVisible(true);
     } catch (e) {
       console.log(e)
       console.log("[ERROR]", e.response.message);
+      console.log(e);
+      console.log("[ERROR]", e.response?.message);
     }
 
   };
@@ -278,6 +447,12 @@ const handleCancel = () => {
   setVoucherCode(''); 
   
 };
+  const handleCancel = () => {
+    onCancel();
+    setPrice(a);
+    setVoucherCode("");
+  };
+  
   return (
     <div>
     <Modal
@@ -516,6 +691,41 @@ const handleCancel = () => {
               <p className="text-[16px] mb-[5px]">
                 <b>{selectedRoom.roomName}</b>
               </p>
+                      >
+                        Wowo
+                      </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Form>
+              </div>
+            </ConfigProvider>
+          </Col>
+          {/* information */}
+          <Col span={8}>
+            {/* information hotel */}
+            <div className="flex flex-col space-y-4">
+              <div className=" p-7 h-auto border-[1px] border-gray-300 rounded-[10px]">
+                {" "}
+                <div className="flex space-x-5">
+                  <h4 className="font-lobster">{selectedHotel.hotelName}</h4>
+                  <RateStar hotel={selectedHotel}></RateStar>{" "}
+                </div>
+                <p className="text-[16px] mb-[5px]">
+                  {selectedHotel.address}, {selectedHotel.city},{" "}
+                  {selectedHotel.nation}
+                </p>
+                <div className="text-[16px]">
+                  {t("hotelphone")}: {selectedHotel.phoneNum}
+                </div>
+              </div>
+              {/* information rooms */}
+              <div className="h-[150px] p-6 border-[1px] border-gray-300 rounded-[10px]">
+                <p className="text-[15px] mb-[5px]  mt-[2px]">
+                  {t("contain")} {selectedRoom.capacity} {t("nguoi")}
+                </p>
+                <p className="text-[16px] mb-[5px]">
+                  <b>{selectedRoom.roomName}</b>
+                </p>
 
               <div className="flex space-x-5">
                 <span>{t('loai')}: {selectedRoom.typeOfRoom}</span>
@@ -613,6 +823,19 @@ const handleCancel = () => {
           ): ''}
     </Modal>
   </div>
+      >
+        <div className="text-center p-2 text-[16px]">
+          <p>
+            {t("1st")} {payment}
+          </p>
+          <p>
+            {t("2nd")} {formatMoney(price)} {t("3rd")}{" "}
+            <span className="text-success">{convertPrice} USD </span>
+          </p>
+        </div>
+        {payment && paymentContext.strategy && paymentContext.strategy.renderPaymentUI()}
+      </Modal>
+    </div>
   );
 }
 
