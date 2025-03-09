@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Image, Input, InputNumber, Modal, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { openNotification } from "../hooks/notification";
+import { openNotification } from "./notification";
 import { addRoom, updateRooms } from "../hooks/redux/roomsSlice";
 import { setHotels } from "../hooks/redux/hotelsSclice";
 import { useForm } from "antd/es/form/Form";

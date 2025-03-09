@@ -20,7 +20,7 @@ import {
   updateHotels,
 } from "../../../hooks/redux/hotelsSclice";
 import { useDispatch, useSelector } from "react-redux";
-import { openNotification } from '../../../hooks/notification';
+import { openNotification } from "../../../component/notification";
 import ModalAmenities from "../../../component/ModalAmenities";
 import ImageUploader from "../../../component/ImageUploader";
 const { Option } = Select;
