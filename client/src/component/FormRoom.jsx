@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { Form, Modal, Input, InputNumber, Row, Col, Image, Select } from 'antd'
-import { useSelector, useDispatch } from "react-redux";
-import { openNotification } from '../hooks/notification'
-import { addRoom, updateRooms } from "../hooks/redux/roomsSlice"
-import { setHotels } from '../hooks/redux/hotelsSclice';
-import { useForm } from 'antd/es/form/Form';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Form, Image, Input, InputNumber, Modal, Select } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { openNotification } from "./notification";
+import { addRoom, updateRooms } from "../hooks/redux/roomsSlice";
+import { setHotels } from "../hooks/redux/hotelsSclice";
+import { useForm } from "antd/es/form/Form";
+import axios from "axios";
+import ImageUploader from "./ImageUploader";
 function FormRoom({ isVisible, close }) {
     const [images, setImages] = useState([])
     const [form] = useForm()
@@ -44,74 +45,54 @@ function FormRoom({ isVisible, close }) {
                     }
                 )))
 
-                hotels = [
-                    ...hotels,
-                    {
-                        value: "",
-                        label: "Chọn khách sạn"
-                    }
-                ]
-                dispatch(setHotels(hotels))
-            })
-            .catch(err => console.log(err))
+        hotels = [
+          ...hotels,
+          {
+            value: "",
+            label: "Chọn khách sạn",
+          },
+        ];
+        dispatch(setHotels(hotels));
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  console.log(hotels);
+  const option = hotels.map((item) => ({
+    value: item._id ?? item.value,
+    label: item.hotelName ?? item.label,
+  }));
+  useEffect(() => {
+    form.setFieldsValue({
+      roomName: selectedRoom.roomName ?? "",
+      typeOfRoom: selectedRoom.typeOfRoom ?? "",
+      capacity: selectedRoom.capacity ?? "",
+      numberOfRooms: selectedRoom.numberOfRooms ?? "",
+      numberOfBeds: selectedRoom.numberOfBeds ?? "",
+      money: selectedRoom.money ?? "",
+      hotelID: selectedRoom?.hotelID?._id ?? "",
+    });
+    setImages(selectedRoom.imgLink ?? []);
+  }, [isVisible, selectedRoom, form]);
 
-    }, [])
-    console.log(hotels)
-    const option = hotels.map(item => (
-        {
-            value: item._id ?? item.value,
-            label: item.hotelName ?? item.label
-        }
-    ))
-    useEffect(() => {
-        form.setFieldsValue({
-            roomName: selectedRoom.roomName ?? "",
-            typeOfRoom: selectedRoom.typeOfRoom ?? "",
-            capacity: selectedRoom.capacity ?? "",
-            numberOfRooms: selectedRoom.numberOfRooms ?? "",
-            numberOfBeds: selectedRoom.numberOfBeds ?? "",
-            money: selectedRoom.money ?? "",
-            hotelID: selectedRoom?.hotelID?._id ?? "",
-        });
-        setImages(selectedRoom.imgLink ?? [])
-    }, [isVisible, selectedRoom, form])
-    const handleImage = async (e) => {
-        e.stopPropagation()
-        const files = e.target.files
-        let formData = new FormData()
-        for (let i of files) {
-            formData.append("file", i)
-            formData.append("upload_preset", "uploat_data")
-            const res = await fetch("https://api.cloudinary.com/v1_1/da5mlszld/image/upload", {
-                method: "POST",
-                body: formData
-            })
-            const uploadedImageURL = await res.json()
-            setImages(pre => [
-                ...pre,
-                uploadedImageURL.url,
-            ])
-        }
+  const formatMoney = (money) => {
+    return new Intl.NumberFormat("de-DE").format(money);
+  };
+  const handleDelete = async (item) => {
+    setImages((pre) => pre.filter((image) => image !== item));
+  };
+  const hanldeInsert = async () => {
+    form.submit();
+  };
+  const onFinish = async (values) => {
+    const { money } = values;
+    if (money < 0) {
+      openNotification("error", "Giá tiền không được âm !", "");
+      return;
     }
-    const formatMoney = (money) => {
-        return new Intl.NumberFormat('de-DE').format(money)
-    }
-    const handleDelete = async (item) => {
-        setImages(pre => pre.filter(image => image !== item))
-    }
-    const hanldeInsert = async () => {
-        form.submit()
-    }
-    const onFinish = async (values) => {
-        const { money } = values
-        if (money < 0) {
-            openNotification(false, "Giá tiền không được âm !", "")
-            return
-        }
-        const formInput = {
-            ...values,
-            imgLink: images
-        }
+    const formInput = {
+      ...values,
+      imgLink: images,
+    };
 
         if (isEmpty(selectedRoom)) {
             axios.post(`${BE_PORT}/api/hotelList/createRoom`, formInput)
@@ -215,69 +196,57 @@ function FormRoom({ isVisible, close }) {
                         <InputNumber max={30} min={0} className='inputnumber-room w-[30%]' placeholder='Nhập số lượng giường' />
                     </Form.Item>
 
-                    <Form.Item
-                        min={1}
-                        label={"Giá tiền"}
-                        name={"money"}
-                        rules={[{ required: true, message: 'Vui lòng nhập giá tiền !' }]}
-
-                    >
-                        <InputNumber
-                            placeholder='Nhập giá tiền'
-                            addonAfter={"VNĐ"}
-                            formatter={(value) => {
-                                if (!value) return '';
-                                const numericValue = removeLettersAndReturnValue(value)
-                                return formatMoney(numericValue)
-                            }
-
-                            }
-                            parser={(value) => {
-                                // Loại bỏ 'VNĐ' và các ký tự không phải số
-                                return value.replace(/\s?VNĐ|[^0-9]/g, '');
-                            }}
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        label={"Loại phòng"}
-                        name={"typeOfRoom"}
-                        rules={[{ required: true, message: 'Vui lòng nhâp tên loại phòng !' }]}
-                    >
-                        <Select options={typeRooms} placeholder='Nhập loại phòng' defaultValue={""} className='text-center' />
-                    </Form.Item>
-                    <Form.Item
-                        label={"Thuộc khách sạn"}
-                        name={"hotelID"}
-                        rules={[{ required: true, message: 'Vui lòng chọn khách sạn !' }]}
-                    >
-
-                        <Select className=' w-[87%] text-center' options={option} />
-                    </Form.Item>
-                    <Form.Item
-                        label={"Chọn hình"}
-                        name={"imgLink"}
-                    >
-                        <Input type="file" className='w-[87%]' onChange={handleImage} multiple />
-                    </Form.Item>
-                </Form>
-                <div className=' flex gap-4 justify-center items-center'>
-                    {images?.map(item => (
-                        <div className="relative inline-block overflow-hidden">
-                            <Image src={item} className="object-cover rounded-md" alt="item" />
-                            <button
-                                className="absolute top-1 right-1 bg-red-500 text-center items-center text-white rounded-full p-1 w-[20px] h-[20px] flex justify-center"
-                                onClick={() => handleDelete(item)}
-                            >
-                                x
-                            </button>
-                        </div>
-                    ))}
-
-                </div>
-            </Modal>
-        </>
-
-    )
+          <Form.Item
+            min={1}
+            label={"Giá tiền"}
+            name={"money"}
+            rules={[{ required: true, message: "Vui lòng nhập giá tiền !" }]}
+          >
+            <InputNumber
+              placeholder="Nhập giá tiền"
+              addonAfter={"VNĐ"}
+              formatter={(value) => {
+                if (!value) return "";
+                const numericValue = removeLettersAndReturnValue(value);
+                return formatMoney(numericValue);
+              }}
+              parser={(value) => {
+                // Loại bỏ 'VNĐ' và các ký tự không phải số
+                return value.replace(/\s?VNĐ|[^0-9]/g, "");
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label={"Loại phòng"}
+            name={"typeOfRoom"}
+            rules={[
+              { required: true, message: "Vui lòng nhâp tên loại phòng !" },
+            ]}
+          >
+            <Select
+              options={typeRooms}
+              placeholder="Nhập loại phòng"
+              defaultValue={""}
+              className="text-center"
+            />
+          </Form.Item>
+          <Form.Item
+            label={"Thuộc khách sạn"}
+            name={"hotelID"}
+            rules={[{ required: true, message: "Vui lòng chọn khách sạn !" }]}
+          >
+            <Select className=" w-[87%] text-center" options={option} />
+          </Form.Item>
+          <ImageUploader
+          images={images}
+          setImages={setImages}
+          handleDelete={handleDelete}
+        />
+        </Form>
+    
+      </Modal>
+    </>
+  );
 }
 
 export default FormRoom
