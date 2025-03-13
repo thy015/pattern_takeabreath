@@ -6,7 +6,7 @@ import { addRoom, updateRooms } from "../hooks/redux/roomsSlice";
 import { setHotels } from "../hooks/redux/hotelsSclice";
 import { useForm } from "antd/es/form/Form";
 import axios from "axios";
-
+import ImageUploader from "./ImageUploader";
 function FormRoom({ isVisible, close }) {
   const [images, setImages] = useState([]);
   const [form] = useForm();
@@ -73,24 +73,7 @@ function FormRoom({ isVisible, close }) {
     });
     setImages(selectedRoom.imgLink ?? []);
   }, [isVisible, selectedRoom, form]);
-  const handleImage = async (e) => {
-    e.stopPropagation();
-    const files = e.target.files;
-    let formData = new FormData();
-    for (let i of files) {
-      formData.append("file", i);
-      formData.append("upload_preset", "uploat_data");
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/da5mlszld/image/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const uploadedImageURL = await res.json();
-      setImages((pre) => [...pre, uploadedImageURL.url]);
-    }
-  };
+
   const formatMoney = (money) => {
     return new Intl.NumberFormat("de-DE").format(money);
   };
@@ -284,32 +267,13 @@ function FormRoom({ isVisible, close }) {
           >
             <Select className=" w-[87%] text-center" options={option} />
           </Form.Item>
-          <Form.Item label={"Chọn hình"} name={"imgLink"}>
-            <Input
-              type="file"
-              className="w-[87%]"
-              onChange={handleImage}
-              multiple
-            />
-          </Form.Item>
+          <ImageUploader
+          images={images}
+          setImages={setImages}
+          handleDelete={handleDelete}
+        />
         </Form>
-        <div className=" flex gap-4 justify-center items-center">
-          {images?.map((item) => (
-            <div className="relative inline-block overflow-hidden">
-              <Image
-                src={item}
-                className="object-cover rounded-md"
-                alt="item"
-              />
-              <button
-                className="absolute top-1 right-1 bg-red-500 text-center items-center text-white rounded-full p-1 w-[20px] h-[20px] flex justify-center"
-                onClick={() => handleDelete(item)}
-              >
-                x
-              </button>
-            </div>
-          ))}
-        </div>
+    
       </Modal>
     </>
   );
